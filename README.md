@@ -6,8 +6,3 @@ The IDE is pycharm. Environment is anaconda.
 2023,05,16
 At this moment, there is only convolution feature separate with neural network.
 
-hihi test
-
-
-test2
-
