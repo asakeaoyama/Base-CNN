@@ -40,6 +40,15 @@ def padding(data):
                 pdata[y+1][x+1][rgb] = data[y][x][rgb]
     return pdata
 
+def nextpadding(convdata):
+    print(convdata)
+    pdata = [[[0 for i in range(len(convdata[0][0]))]for x in range(len(convdata[0])+2)]for y in range(len(convdata)+2)]
+    for i in range(len(convdata[0][0])):
+        for y in range(len(convdata)):
+            for x in range(len(convdata[0])):
+                pdata[y + 1][x + 1][i] = data[y][x][i]
+    return pdata
+
 
 # def firstConvTest(pdata):
 #     #format [straight][horizontal]
@@ -187,7 +196,7 @@ if __name__ == '__main__':
     pdata = padding(data)
     #firstconvdata = firstConv(pdata)
     convdata = conv(pdata, 3)
-    p2data = padding(convdata)
+    p2data = nextpadding(convdata)
     nextconvdata = nextConv(p2data, 3)
     output = lastmerge(nextconvdata)
     pooling = pooling(output)
