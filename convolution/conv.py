@@ -120,7 +120,7 @@ def conv(pdata, times):
                 # convdataGray[y - 1][x - 1][0] , convdataGray[y - 1][x - 1][1] , convdataGray[y - 1][x - 1][2] = gray, \
                 #                                                                                             gray, gray
 
-    print(kernalArr)
+    #print(convdataOut)
     return convdataOut
 
 def nextConv(pdata, times):
@@ -131,10 +131,9 @@ def nextConv(pdata, times):
     kernalArr = []
 
     #compress pdata(y*x*16dim) to condataL2(y*x*1dim)
-    for i in range(times):
-        for y in range(len(pdata[i])):
-            for x in range(len(pdata[i][y])):
-                convdataL2[y][x] = sum(pdata[y][x])
+    for y in range(len(pdata)):
+        for x in range(len(pdata[y])):
+            convdataL2[y][x] = sum(pdata[y][x])
 
     #convolution
     for i in range(times):
@@ -151,8 +150,32 @@ def nextConv(pdata, times):
                                                convdataL2[y + 1][x - 1] * kernal[2][0] + \
                                                convdataL2[y + 1][x] * kernal[2][1] + \
                                                convdataL2[y + 1][x + 1] * kernal[2][2]
+    #print(convdataOut)
+    return convdataOut
 
-    return convdataL2
+def lastmerge(convdata):
+    #print(convdata)
+    convedData = [[0 for x in range(len(convdata[0]))] for y in range(len(convdata))]
+    for y in range(len(convdata)):
+        for x in range(len(convdata[y])):
+            convedData[y][x] = sum(convdata[y][x])
+            #print(sum(convdata[y][x]))
+    #print(convedData)
+    return convedData
+
+
+def pooling(conved):
+    #print(len(conved),len(conved[0]))
+    #print(conved)
+    # conved format: [y][x]
+    poolingOut = [[0 for x in range(width-2)] for y in range(height-2)]
+
+    for y in range(1, len(conved) - 1):
+        for x in range(1, len(conved[y]) - 1):
+            poolingOut[y-1][x-1] = max(conved[y - 1][x - 1], conved[y - 1][x], conved[y - 1 ][x + 1],
+                                       conved[y][x - 1], conved[y][x], conved[y][x + 1],
+                                       conved[y + 1][x - 1], conved[y + 1][x], conved[y + 1][x + 1])
+    return poolingOut
 
 
 
@@ -166,8 +189,9 @@ if __name__ == '__main__':
     convdata = conv(pdata, 3)
     p2data = padding(convdata)
     nextconvdata = nextConv(p2data, 3)
-    #print(convdata[0][0])
-    print(convdata)
+    output = lastmerge(nextconvdata)
+    pooling = pooling(output)
+    print(pooling)
 
     # testimg = Image.fromarray(np.uint8(convdata))
     # testimg.show()
