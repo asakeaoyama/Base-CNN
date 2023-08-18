@@ -32,21 +32,22 @@ def importImgToData(path):
     return data
 
 #padding 0 surround the picture data
-def padding(data):
-    pdata = [[[0 for rgb in range(3)] for x in range(width+2)] for y in range(height+2)]
-    for y in range(height):
-        for x in range(width):
-            for rgb in range(3):
-                pdata[y+1][x+1][rgb] = data[y][x][rgb]
-    return pdata
+# def padding(data):
+#     pdata = [[[0 for rgb in range(3)] for x in range(width+2)] for y in range(height+2)]
+#     for y in range(len(data)):
+#         for x in range(len(data[y])):
+#             for rgb in range(3):
+#                 pdata[y+1][x+1][rgb] = data[y][x][rgb]
+#     return pdata
 
-def nextpadding(convdata):
-    print(convdata)
-    pdata = [[[0 for i in range(len(convdata[0][0]))]for x in range(len(convdata[0])+2)]for y in range(len(convdata)+2)]
+#padding 0 surround the picture data
+def padding(convdata, times):
+    #print(convdata)
+    pdata = [[[0 for i in range(len(convdata[0][0]))]for x in range(len(convdata[0])+(2*times))]for y in range(len(convdata)+(2*times))]
     for i in range(len(convdata[0][0])):
         for y in range(len(convdata)):
             for x in range(len(convdata[0])):
-                pdata[y + 1][x + 1][i] = data[y][x][i]
+                pdata[y + times][x + times][i] = data[y][x][i]
     return pdata
 
 
@@ -84,7 +85,14 @@ def ranKernal():
     print(ker)
     return ker
 
-def conv(pdata, times):
+def conv(data, times, strides):
+
+    #psteps = ( n(s-1) - s + f ) / 2
+    padding_steps = int((len(data)*(strides - 1) - strides + 3 ) / 2)
+    #padding
+    pdata = padding(data, padding_steps)
+    #calculate the output data size : ((n + 2p - f) / s ) + 1
+    sizeConvdataOut = (len(data) + 2*padding_steps - 3 / strides ) + 1
     #convdataOut[y][x][i = conv times(16)]
     convdata = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
     convdataGray = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
@@ -120,10 +128,11 @@ def conv(pdata, times):
                                             pdata[y + 1][x - 1][2] * kernal[2][0] + pdata[y + 1][x][2] * kernal[2][
                                                 1] + \
                                             pdata[y + 1][x + 1][2] * kernal[2][2]
-                #merge RGB data
+                #merge RGB data : convdata[][][] to convdataOut[][][]
                 convdataOut[y - 1][x - 1][i] = convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + \
                                                convdata[y - 1][x - 1][2]
-
+                #x += strides - 1
+            #y += strides - 1
                 #test trans to gray
                 # gray = (convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + convdata[y - 1][x - 1][2]) / 3
                 # convdataGray[y - 1][x - 1][0] , convdataGray[y - 1][x - 1][1] , convdataGray[y - 1][x - 1][2] = gray, \
@@ -192,12 +201,10 @@ def pooling(conved):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    data = importImgToData('../pic/10x10.PNG')
-    pdata = padding(data)
-    #firstconvdata = firstConv(pdata)
-    convdata = conv(pdata, 3)
-    p2data = nextpadding(convdata)
-    nextconvdata = nextConv(p2data, 3)
+    data = importImgToData('../pic/train.jpg')
+    #pdata = padding(data)
+    convdata = conv(data, 3 , 1)
+    nextconvdata = nextConv(convdata, 3)
     output = lastmerge(nextconvdata)
     pooling = pooling(output)
     print(pooling)
