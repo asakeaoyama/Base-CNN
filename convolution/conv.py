@@ -15,11 +15,12 @@ def importImgToData(path):
     global height, width
     orgImg = Image.open(path)
     pxMatrix = np.asarray(orgImg)
-    print("pic dim :", pxMatrix.ndim)
+    #print("pic dim :", pxMatrix.ndim)
 
     height = orgImg.height
     width = orgImg.width
     data = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
+    #print(height, width)
 
     for y in range(height):
         for x in range(width):
@@ -50,33 +51,6 @@ def padding(convdata, times):
                 pdata[y + times][x + times][i] = data[y][x][i]
     return pdata
 
-
-# def firstConvTest(pdata):
-#     #format [straight][horizontal]
-#     convdata = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
-#     XKernal = [[1, 0, 1],
-#                [0, 1, 0],
-#                [1, 0, 1]]
-#     for y in range(1, len(pdata)-1):
-#         for x in range(1, len(pdata[y])-1):
-#             convdata[y-1][x-1][0] = pdata[y-1][x-1][0]*XKernal[0][0] + pdata[y-1][x][0]*XKernal[0][1] + pdata[y-1][x+1][0]*XKernal[0][2] +\
-#                                     pdata[y][x - 1][0] * XKernal[1][0] + pdata[y][x][0]*XKernal[1][1] + pdata[y][x+1][0]*XKernal[1][2] +\
-#                                     pdata[y+1][x - 1][0] * XKernal[2][0] + pdata[y+1][x][0]*XKernal[2][1] + pdata[y+1][x+1][0]*XKernal[2][2]
-#             convdata[y - 1][x - 1][1] = pdata[y - 1][x - 1][1] * XKernal[0][0] + pdata[y - 1][x][1] * XKernal[0][1] + \
-#                                         pdata[y - 1][x + 1][1] * XKernal[0][2] + \
-#                                         pdata[y][x - 1][1] * XKernal[1][0] + pdata[y][x][1] * XKernal[1][1] + pdata[y][
-#                                             x + 1][1] * XKernal[1][2] + \
-#                                         pdata[y + 1][x - 1][1] * XKernal[2][0] + pdata[y + 1][x][1] * XKernal[2][1] + \
-#                                         pdata[y + 1][x + 1][1] * XKernal[2][2]
-#             convdata[y - 1][x - 1][2] = pdata[y - 1][x - 1][2] * XKernal[0][0] + pdata[y - 1][x][2] * XKernal[0][1] + \
-#                                         pdata[y - 1][x + 1][2] * XKernal[0][2] + \
-#                                         pdata[y][x - 1][2] * XKernal[1][0] + pdata[y][x][2] * XKernal[1][1] + pdata[y][
-#                                             x + 1][2] * XKernal[1][2] + \
-#                                         pdata[y + 1][x - 1][2] * XKernal[2][0] + pdata[y + 1][x][2] * XKernal[2][1] + \
-#                                         pdata[y + 1][x + 1][2] * XKernal[2][2]
-#     return convdata
-
-
 def ranKernal():
     ker = [[0 for x in range(3)]for y in range(3)]
     for i in range(3):
@@ -85,18 +59,19 @@ def ranKernal():
     print(ker)
     return ker
 
-def conv(data, times, strides):
+def firstConv(data, times, strides):
 
     #psteps = ( n(s-1) - s + f ) / 2
     padding_steps = int((len(data)*(strides - 1) - strides + 3 ) / 2)
     #padding
     pdata = padding(data, padding_steps)
     #calculate the output data size : ((n + 2p - f) / s ) + 1
-    sizeConvdataOut = (len(data) + 2*padding_steps - 3 / strides ) + 1
+    sizeConvdataOut = int(len(data) + 2*padding_steps - 3 / strides ) + 1
+    #print(sizeConvdataOut)
     #convdataOut[y][x][i = conv times(16)]
-    convdata = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
+    convdata = [[[0 for rgb in range(3)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
     convdataGray = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
-    convdataOut = [[[0 for i in range(times)]for x in range(width)]for y in range(height)]
+    convdataOut = [[[0 for i in range(times)]for x in range(sizeConvdataOut)]for y in range(sizeConvdataOut)]
     kernalArr = []
 
     for i in range(times):
@@ -131,8 +106,8 @@ def conv(data, times, strides):
                 #merge RGB data : convdata[][][] to convdataOut[][][]
                 convdataOut[y - 1][x - 1][i] = convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + \
                                                convdata[y - 1][x - 1][2]
-                #x += strides - 1
-            #y += strides - 1
+                x += strides - 1
+            y += strides - 1
                 #test trans to gray
                 # gray = (convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + convdata[y - 1][x - 1][2]) / 3
                 # convdataGray[y - 1][x - 1][0] , convdataGray[y - 1][x - 1][1] , convdataGray[y - 1][x - 1][2] = gray, \
@@ -141,11 +116,18 @@ def conv(data, times, strides):
     #print(convdataOut)
     return convdataOut
 
-def nextConv(pdata, times):
+def nextConv(data, times, strides):
+    # psteps = ( n(s-1) - s + f ) / 2
+    padding_steps = int((len(data) * (strides - 1) - strides + 3) / 2)
+    # padding
+    pdata = padding(data, padding_steps)
+    # calculate the output data size : ((n + 2p - f) / s ) + 1
+    sizeConvdataOut = int(len(data) + 2 * padding_steps - 3 / strides) + 1
+    # print(sizeConvdataOut)
     #pdata = condataout (layer1)
     #pdata formate: [y][x][i = conv times(16)]
-    convdataL2 = [[0 for x in range(width + 2)] for y in range(height + 2)]
-    convdataOut = [[[0 for i in range(times)] for x in range(width)] for y in range(height)]
+    convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
+    convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
     kernalArr = []
 
     #compress pdata(y*x*16dim) to condataL2(y*x*1dim)
@@ -172,7 +154,7 @@ def nextConv(pdata, times):
     return convdataOut
 
 def lastmerge(convdata):
-    #print(convdata)
+    #[y][x][] to [y][x]
     convedData = [[0 for x in range(len(convdata[0]))] for y in range(len(convdata))]
     for y in range(len(convdata)):
         for x in range(len(convdata[y])):
@@ -201,12 +183,13 @@ def pooling(conved):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    data = importImgToData('../pic/train.jpg')
-    #pdata = padding(data)
-    convdata = conv(data, 3 , 1)
-    nextconvdata = nextConv(convdata, 3)
+    data = importImgToData('../pic/gabrielsmall.jpg') # square picture only
+    #convdata = firstConv(data, 3 , 1)
+    convdata = nextConv(data,3 ,1)
+    nextconvdata = nextConv(convdata, 3, 1)
     output = lastmerge(nextconvdata)
     pooling = pooling(output)
+    print(len(pooling), len(pooling[1]))
     print(pooling)
 
     # testimg = Image.fromarray(np.uint8(convdata))
