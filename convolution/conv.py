@@ -33,6 +33,26 @@ def importImgToData(path):
 
     return data
 
+def importMNISTToData(path):
+    orgImg = Image.open(path)
+    pxMatrix = np.asarray(orgImg)
+    # print("pic dim :", pxMatrix.ndim)
+
+    height = orgImg.height
+    width = orgImg.width
+    data = [[0 for x in range(width)] for y in range(height)]
+    # print(height, width)
+
+    for y in range(height):
+        for x in range(width):
+            r, g, b, a= pxMatrix[y][x]
+            # print(r, g, b)
+            # data[y][x][0] = r
+            # data[y][x][1] = g
+            # data[y][x][2] = b
+            data[y][x] = a
+    return data
+
 
 #padding 0 surround the picture data
 def padding(convdata, times):
@@ -175,7 +195,12 @@ def pooling(conved):
                                        conved[y + 1][x - 1], conved[y + 1][x], conved[y + 1][x + 1])
     return poolingOut
 
-
+def flatten2DTo1D(poolingOut):
+    flattenData = []
+    for y in range(len(poolingOut)):
+        for x in range(len(poolingOut[0])):
+            flattenData.append(poolingOut[y][x])
+    return flattenData
 
 
 
@@ -185,10 +210,11 @@ if __name__ == '__main__':
     #convdata = firstConv(data, 3 , 1)
     convdata = nextConv(data,3 ,2)
     nextconvdata = nextConv(convdata, 3, 2)
-    #output = lastmerge(nextconvdata)
-    # pooling = pooling(output)
+    output = lastmerge(nextconvdata)
+    pooling = pooling(output)
+    flatten = flatten2DTo1D(pooling)
     # print(len(pooling), len(pooling[1]))
-    # print(pooling)
+    print(flatten)
 
     # testimg = Image.fromarray(np.uint8(convdata))
     # testimg.show()

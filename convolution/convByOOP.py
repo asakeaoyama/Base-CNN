@@ -10,16 +10,53 @@ class conv():
 
     finalOutput = 0
 
-    def __init__(self, path, layers, times, strides):
+    # def __init__(self, path, layers, times, strides):
+    #
+    #     self.data = self.importImgToData(path)  # square picture only
+    #     # convdata = firstConv(data, times , strides)
+    #     convdata = self.nextConv(self.data, times, strides)
+    #     nextconvdata = self.nextConv(convdata, times, strides)
+    #     conved = self.lastmerge(nextconvdata)
+    #
+    #     pooling = self.pooling(conved)
+    #     flatten = self.flatten2DTo1D(pooling)
+    #     self.finalOutput = flatten
 
-        self.data = self.importImgToData(path)  # square picture only
+    def __init__(self, path, isMNIST, layers, times, strides):
+        if(isMNIST == True ):
+            self.data = self.importMNISTToData(path)  # square picture only
+        else:
+            self.data = self.importImgToData(path)  # square picture only
         # convdata = firstConv(data, times , strides)
         convdata = self.nextConv(self.data, times, strides)
         nextconvdata = self.nextConv(convdata, times, strides)
         conved = self.lastmerge(nextconvdata)
 
         pooling = self.pooling(conved)
-        self.finalOutput = pooling
+        flatten = self.flatten2DTo1D(pooling)
+        self.finalOutput = flatten
+
+    def importMNISTToData(self, path):
+        orgImg = Image.open(path)
+        pxMatrix = np.asarray(orgImg)
+        # print("pic dim :", pxMatrix.ndim)
+
+        self.height = orgImg.height
+        self.width = orgImg.width
+        data = [[0 for x in range(self.width)] for y in range(self.height)]
+        # print(height, width)
+
+        for y in range(self.height):
+            for x in range(self.width):
+                r, g, b, a= pxMatrix[y][x]
+                # print(r, g, b)
+                # data[y][x][0] = r
+                # data[y][x][1] = g
+                # data[y][x][2] = b
+                data[y][x] = a
+
+        self.data = data
+        return data
 
     def importImgToData(self, path):
         orgImg = Image.open(path)
@@ -188,9 +225,16 @@ class conv():
                                                conved[y + 1][x - 1], conved[y + 1][x], conved[y + 1][x + 1])
         return poolingOut
 
+    def flatten2DTo1D(self, poolingOut):
+        flattenData = []
+        for y in range(len(poolingOut)):
+            for x in range(len(poolingOut[0])):
+                flattenData.append(poolingOut[y][x])
+        return flattenData
+
 
 if __name__ == '__main__':
-    convly = conv('../pic/10x10.PNG', 2, 3, 2)
+    convly = conv('../pic/10x10.PNG',False, 2, 3, 2)
     print(convly.finalOutput)
 
 
