@@ -40,17 +40,17 @@ def importMNISTToData(path):
 
     height = orgImg.height
     width = orgImg.width
-    data = [[0 for x in range(width)] for y in range(height)]
+    data = [[[0 for rgb in range(3)] for x in range(width)] for y in range(height)]
     # print(height, width)
 
     for y in range(height):
         for x in range(width):
             r, g, b, a= pxMatrix[y][x]
             # print(r, g, b)
-            # data[y][x][0] = r
+            data[y][x][0] = a
             # data[y][x][1] = g
             # data[y][x][2] = b
-            data[y][x] = a
+            #data[y][x] = a
     return data
 
 

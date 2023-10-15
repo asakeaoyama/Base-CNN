@@ -43,17 +43,19 @@ class conv():
 
         self.height = orgImg.height
         self.width = orgImg.width
-        data = [[0 for x in range(self.width)] for y in range(self.height)]
+        data = [[[0 for rgb in range(3)] for x in range(self.width)] for y in range(self.height)]
         # print(height, width)
 
         for y in range(self.height):
             for x in range(self.width):
                 r, g, b, a= pxMatrix[y][x]
                 # print(r, g, b)
-                # data[y][x][0] = r
+                data[y][x][0] = a
                 # data[y][x][1] = g
                 # data[y][x][2] = b
-                data[y][x] = a
+                #data[y][x] = a
+
+        print(data)
 
         self.data = data
         return data
@@ -158,7 +160,7 @@ class conv():
         # psteps = ( n(s-1) - s + f ) / 2
         padding_steps = int(ceil((len(data) * (strides - 1) - strides + 3) / 2))
         print(len(data))
-        print(padding_steps)
+        print("padding steps: ",padding_steps)
         # padding
         pdata = self.padding(data, padding_steps)
         # calculate the output data size : ((n + 2p - f) / s ) + 1
@@ -169,7 +171,7 @@ class conv():
         convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
         convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
         kernalArr = []
-        print(len(convdataL2))
+        print("conved:",len(convdataL2))
 
         # compress pdata(y*x*16dim) to condataL2(y*x*1dim)
         for y in range(len(pdata)):
@@ -234,7 +236,8 @@ class conv():
 
 
 if __name__ == '__main__':
-    convly = conv('../pic/10x10.PNG',False, 2, 3, 2)
+    #convly = conv('../pic/10x10.PNG',False, 2, 3, 2)
+    convly = conv('../pic/4/0.png', True, 2, 3, 1)
     print(convly.finalOutput)
 
 
