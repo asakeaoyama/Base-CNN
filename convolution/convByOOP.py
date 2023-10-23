@@ -7,6 +7,8 @@ class conv():
     width = 0
     height = 0
     data = 0
+    # kernel Set [convlayer][kernels][kernelY][kernelX]
+    kerSet = []
 
     finalOutput = 0
 
@@ -82,7 +84,7 @@ class conv():
                     pdata[y + times][x + times][i] = convdata[y][x][i]
         return pdata
 
-    def ranKernal(self):
+    def ranKernel(self):
         ker = [[0 for x in range(3)] for y in range(3)]
         for i in range(3):
             for j in range(3):
@@ -103,37 +105,37 @@ class conv():
         convdata = [[[0 for rgb in range(3)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
         convdataGray = [[[0 for rgb in range(3)] for x in range(self.width)] for y in range(self.height)]
         convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
-        kernalArr = []
+        kernelArr = []
 
         for i in range(times):
-            kernal = self.ranKernal()
-            kernalArr.append(kernal)
+            kernel = self.ranKernel()
+            kernelArr.append(kernel)
             for y in range(1, len(pdata) - 1):
                 for x in range(1, len(pdata[y]) - 1):
-                    convdata[y - 1][x - 1][0] = pdata[y - 1][x - 1][0] * kernal[0][0] + pdata[y - 1][x][0] * kernal[0][
-                        1] + pdata[y - 1][x + 1][0] * kernal[0][2] + \
-                                                pdata[y][x - 1][0] * kernal[1][0] + pdata[y][x][0] * kernal[1][1] + \
-                                                pdata[y][x + 1][0] * kernal[1][2] + \
-                                                pdata[y + 1][x - 1][0] * kernal[2][0] + pdata[y + 1][x][0] * kernal[2][
-                                                    1] + pdata[y + 1][x + 1][0] * kernal[2][2]
-                    convdata[y - 1][x - 1][1] = pdata[y - 1][x - 1][1] * kernal[0][0] + pdata[y - 1][x][1] * kernal[0][
+                    convdata[y - 1][x - 1][0] = pdata[y - 1][x - 1][0] * kernel[0][0] + pdata[y - 1][x][0] * kernel[0][
+                        1] + pdata[y - 1][x + 1][0] * kernel[0][2] + \
+                                                pdata[y][x - 1][0] * kernel[1][0] + pdata[y][x][0] * kernel[1][1] + \
+                                                pdata[y][x + 1][0] * kernel[1][2] + \
+                                                pdata[y + 1][x - 1][0] * kernel[2][0] + pdata[y + 1][x][0] * kernel[2][
+                                                    1] + pdata[y + 1][x + 1][0] * kernel[2][2]
+                    convdata[y - 1][x - 1][1] = pdata[y - 1][x - 1][1] * kernel[0][0] + pdata[y - 1][x][1] * kernel[0][
                         1] + \
-                                                pdata[y - 1][x + 1][1] * kernal[0][2] + \
-                                                pdata[y][x - 1][1] * kernal[1][0] + pdata[y][x][1] * kernal[1][1] + \
+                                                pdata[y - 1][x + 1][1] * kernel[0][2] + \
+                                                pdata[y][x - 1][1] * kernel[1][0] + pdata[y][x][1] * kernel[1][1] + \
                                                 pdata[y][
-                                                    x + 1][1] * kernal[1][2] + \
-                                                pdata[y + 1][x - 1][1] * kernal[2][0] + pdata[y + 1][x][1] * kernal[2][
+                                                    x + 1][1] * kernel[1][2] + \
+                                                pdata[y + 1][x - 1][1] * kernel[2][0] + pdata[y + 1][x][1] * kernel[2][
                                                     1] + \
-                                                pdata[y + 1][x + 1][1] * kernal[2][2]
-                    convdata[y - 1][x - 1][2] = pdata[y - 1][x - 1][2] * kernal[0][0] + pdata[y - 1][x][2] * kernal[0][
+                                                pdata[y + 1][x + 1][1] * kernel[2][2]
+                    convdata[y - 1][x - 1][2] = pdata[y - 1][x - 1][2] * kernel[0][0] + pdata[y - 1][x][2] * kernel[0][
                         1] + \
-                                                pdata[y - 1][x + 1][2] * kernal[0][2] + \
-                                                pdata[y][x - 1][2] * kernal[1][0] + pdata[y][x][2] * kernal[1][1] + \
+                                                pdata[y - 1][x + 1][2] * kernel[0][2] + \
+                                                pdata[y][x - 1][2] * kernel[1][0] + pdata[y][x][2] * kernel[1][1] + \
                                                 pdata[y][
-                                                    x + 1][2] * kernal[1][2] + \
-                                                pdata[y + 1][x - 1][2] * kernal[2][0] + pdata[y + 1][x][2] * kernal[2][
+                                                    x + 1][2] * kernel[1][2] + \
+                                                pdata[y + 1][x - 1][2] * kernel[2][0] + pdata[y + 1][x][2] * kernel[2][
                                                     1] + \
-                                                pdata[y + 1][x + 1][2] * kernal[2][2]
+                                                pdata[y + 1][x + 1][2] * kernel[2][2]
                     # merge RGB data : convdata[][][] to convdataOut[][][]
                     convdataOut[y - 1][x - 1][i] = convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + \
                                                    convdata[y - 1][x - 1][2]
@@ -161,7 +163,7 @@ class conv():
         # pdata formate: [y][x][i = conv times(16)]
         convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
         convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
-        kernalArr = []
+        kernelArr = []
         print("preConvedOutputLen:",len(convdataL2))
 
         # compress pdata(y*x*16dim) to condataL2(y*x*1dim)
@@ -171,29 +173,30 @@ class conv():
 
         # convolution
         for i in range(times):
-            kernal = self.ranKernal()
-            kernalArr.append(kernal)
+            kernel = self.ranKernel()
+            kernelArr.append(kernel)
             for y in range(1, len(convdataL2) - strides, strides):
                 for x in range(1, len(convdataL2[y]) - strides, strides):
                     convdataOut[int((y - 1) / strides)][int((x - 1) / strides)][i] = convdataL2[y - 1][x - 1] * \
-                                                                                     kernal[0][0] + \
-                                                                                     convdataL2[y - 1][x] * kernal[0][
+                                                                                     kernel[0][0] + \
+                                                                                     convdataL2[y - 1][x] * kernel[0][
                                                                                          1] + \
                                                                                      convdataL2[y - 1][x + 1] * \
-                                                                                     kernal[0][2] + \
-                                                                                     convdataL2[y][x - 1] * kernal[1][
+                                                                                     kernel[0][2] + \
+                                                                                     convdataL2[y][x - 1] * kernel[1][
                                                                                          0] + \
-                                                                                     convdataL2[y][x] * kernal[1][1] + \
-                                                                                     convdataL2[y][x + 1] * kernal[1][
+                                                                                     convdataL2[y][x] * kernel[1][1] + \
+                                                                                     convdataL2[y][x + 1] * kernel[1][
                                                                                          2] + \
                                                                                      convdataL2[y + 1][x - 1] * \
-                                                                                     kernal[2][0] + \
-                                                                                     convdataL2[y + 1][x] * kernal[2][
+                                                                                     kernel[2][0] + \
+                                                                                     convdataL2[y + 1][x] * kernel[2][
                                                                                          1] + \
                                                                                      convdataL2[y + 1][x + 1] * \
-                                                                                     kernal[2][2]
+                                                                                     kernel[2][2]
         # print(convdataOut)
         print("postConvedDataLen:", len(convdataOut))
+        self.kerSet.append(kernelArr)
         return convdataOut
 
     def lastmerge(self, convdata):
@@ -225,6 +228,9 @@ class conv():
             for x in range(len(poolingOut[0])):
                 flattenData.append(poolingOut[y][x])
         return flattenData
+
+    def getKernelSet(self):
+        return self.kerSet
 
 
 if __name__ == '__main__':
