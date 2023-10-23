@@ -10,27 +10,18 @@ class conv():
 
     finalOutput = 0
 
-    # def __init__(self, path, layers, times, strides):
-    #
-    #     self.data = self.importImgToData(path)  # square picture only
-    #     # convdata = firstConv(data, times , strides)
-    #     convdata = self.nextConv(self.data, times, strides)
-    #     nextconvdata = self.nextConv(convdata, times, strides)
-    #     conved = self.lastmerge(nextconvdata)
-    #
-    #     pooling = self.pooling(conved)
-    #     flatten = self.flatten2DTo1D(pooling)
-    #     self.finalOutput = flatten
-
     def __init__(self, path, isMNIST, layers, times, strides):
+
         if(isMNIST == True ):
             self.data = self.importMNISTToData(path)  # square picture only
         else:
             self.data = self.importImgToData(path)  # square picture only
         # convdata = firstConv(data, times , strides)
-        convdata = self.nextConv(self.data, times, strides)
-        nextconvdata = self.nextConv(convdata, times, strides)
-        conved = self.lastmerge(nextconvdata)
+        convdata = self.data
+        for i in range(layers):
+            convdata = self.nextConv(convdata, times, strides)
+            print("---------------------------------------------")
+        conved = self.lastmerge(convdata)
 
         pooling = self.pooling(conved)
         flatten = self.flatten2DTo1D(pooling)
@@ -55,7 +46,7 @@ class conv():
                 # data[y][x][2] = b
                 #data[y][x] = a
 
-        print(data)
+        #print(data)
 
         self.data = data
         return data
@@ -159,19 +150,19 @@ class conv():
     def nextConv(self, data, times, strides):
         # psteps = ( n(s-1) - s + f ) / 2
         padding_steps = int(ceil((len(data) * (strides - 1) - strides + 3) / 2))
-        print(len(data))
-        print("padding steps: ",padding_steps)
+        print("datalen:", len(data))
+        print("padding steps:",padding_steps)
         # padding
         pdata = self.padding(data, padding_steps)
         # calculate the output data size : ((n + 2p - f) / s ) + 1
         sizeConvdataOut = int((len(data) + (2 * padding_steps) - 3) / strides) + 1
-        print(sizeConvdataOut)
+        print("predictOutputLan:", sizeConvdataOut)
         # pdata = condataout (layer1)
         # pdata formate: [y][x][i = conv times(16)]
         convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
         convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
         kernalArr = []
-        print("conved:",len(convdataL2))
+        print("preConvedOutputLen:",len(convdataL2))
 
         # compress pdata(y*x*16dim) to condataL2(y*x*1dim)
         for y in range(len(pdata)):
@@ -202,6 +193,7 @@ class conv():
                                                                                      convdataL2[y + 1][x + 1] * \
                                                                                      kernal[2][2]
         # print(convdataOut)
+        print("postConvedDataLen:", len(convdataOut))
         return convdataOut
 
     def lastmerge(self, convdata):
@@ -236,8 +228,8 @@ class conv():
 
 
 if __name__ == '__main__':
-    #convly = conv('../pic/10x10.PNG',False, 2, 3, 2)
-    convly = conv('../pic/4/0.png', True, 2, 3, 1)
+    convly = conv('../pic/10x10.PNG',False, 2, 3, 2)
+    # convly = conv('../pic/4/0.png', True, 2, 3, 1)
     print(convly.finalOutput)
 
 
