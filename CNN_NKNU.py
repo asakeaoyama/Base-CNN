@@ -50,9 +50,9 @@ if __name__ == '__main__':
             # pooling1 = pooling(output)
             # flatten = flatten2DTo1D(pooling1)
             convly = conv('pic/{}/{}.png'.format(num,case), True, 2, 3, 2)
-            # kernal set format : [convLayer][kernals in each layer][Y axis of the kernal][X axis of the kernal]
-            kernalSet = convly.getKernelSet()
-            print(kernalSet)
+            # kernel set format : [convLayer][kernals in each layer][Y axis of the kernal][X axis of the kernal]
+            kernelSet = convly.getKernelSet()
+            print(kernelSet)
             img_arr.append(convly.finalOutput)
             if (num == 3) :
                 ans_arr.append([1,0,0])
