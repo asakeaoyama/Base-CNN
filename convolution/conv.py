@@ -7,6 +7,7 @@
 from PIL import Image
 import numpy as np
 import random
+from math import ceil
 
 width = 0
 height = 0
@@ -32,14 +33,6 @@ def importImgToData(path):
 
     return data
 
-#padding 0 surround the picture data
-# def padding(data):
-#     pdata = [[[0 for rgb in range(3)] for x in range(width+2)] for y in range(height+2)]
-#     for y in range(len(data)):
-#         for x in range(len(data[y])):
-#             for rgb in range(3):
-#                 pdata[y+1][x+1][rgb] = data[y][x][rgb]
-#     return pdata
 
 #padding 0 surround the picture data
 def padding(convdata, times):
@@ -48,7 +41,7 @@ def padding(convdata, times):
     for i in range(len(convdata[0][0])):
         for y in range(len(convdata)):
             for x in range(len(convdata[0])):
-                pdata[y + times][x + times][i] = data[y][x][i]
+                pdata[y + times][x + times][i] = convdata[y][x][i]
     return pdata
 
 def ranKernal():
@@ -118,30 +111,35 @@ def firstConv(data, times, strides):
 
 def nextConv(data, times, strides):
     # psteps = ( n(s-1) - s + f ) / 2
-    padding_steps = int((len(data) * (strides - 1) - strides + 3) / 2)
+    padding_steps = int(ceil((len(data) * (strides - 1) - strides + 3) / 2))
+    print(len(data))
+    print(padding_steps)
     # padding
     pdata = padding(data, padding_steps)
     # calculate the output data size : ((n + 2p - f) / s ) + 1
-    sizeConvdataOut = int(len(data) + 2 * padding_steps - 3 / strides) + 1
-    # print(sizeConvdataOut)
+    sizeConvdataOut = int((len(data) + (2 * padding_steps) - 3 )/ strides) + 1
+    print(sizeConvdataOut)
     #pdata = condataout (layer1)
     #pdata formate: [y][x][i = conv times(16)]
     convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
     convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
     kernalArr = []
+    print(len(convdataL2))
 
     #compress pdata(y*x*16dim) to condataL2(y*x*1dim)
     for y in range(len(pdata)):
         for x in range(len(pdata[y])):
             convdataL2[y][x] = sum(pdata[y][x])
 
+
     #convolution
     for i in range(times):
         kernal = ranKernal()
         kernalArr.append(kernal)
-        for y in range(1, len(pdata) - 1):
-            for x in range(1, len(pdata[y]) - 1):
-                convdataOut[y - 1][x - 1][i] = convdataL2[y - 1][x - 1] * kernal[0][0] + \
+        for y in range(1, len(convdataL2) - strides , strides):
+            for x in range(1, len(convdataL2[y]) - strides , strides):
+                #print(y,x)
+                convdataOut[int((y - 1)/strides)][int((x - 1)/strides)][i] = convdataL2[y - 1][x - 1] * kernal[0][0] + \
                                                convdataL2[y - 1][x] * kernal[0][1] + \
                                                convdataL2[y - 1][x + 1] * kernal[0][2] + \
                                                convdataL2[y][x - 1] * kernal[1][0] + \
@@ -168,7 +166,7 @@ def pooling(conved):
     #print(len(conved),len(conved[0]))
     #print(conved)
     # conved format: [y][x]
-    poolingOut = [[0 for x in range(width-2)] for y in range(height-2)]
+    poolingOut = [[0 for x in range(len(conved[0])-2)] for y in range(len(conved)-2)]
 
     for y in range(1, len(conved) - 1):
         for x in range(1, len(conved[y]) - 1):
@@ -183,14 +181,14 @@ def pooling(conved):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    data = importImgToData('../pic/gabrielsmall.jpg') # square picture only
+    data = importImgToData('../pic/10x10.PNG') # square picture only
     #convdata = firstConv(data, 3 , 1)
-    convdata = nextConv(data,3 ,1)
-    nextconvdata = nextConv(convdata, 3, 1)
-    output = lastmerge(nextconvdata)
-    pooling = pooling(output)
-    print(len(pooling), len(pooling[1]))
-    print(pooling)
+    convdata = nextConv(data,3 ,2)
+    nextconvdata = nextConv(convdata, 3, 2)
+    #output = lastmerge(nextconvdata)
+    # pooling = pooling(output)
+    # print(len(pooling), len(pooling[1]))
+    # print(pooling)
 
     # testimg = Image.fromarray(np.uint8(convdata))
     # testimg.show()
