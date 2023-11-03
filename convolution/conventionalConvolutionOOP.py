@@ -1,5 +1,5 @@
 # Process of this program:
-# read image -> conv (same padding method) -> max pooling -> output(conved array and kernel sets)
+# read image -> conv (decrease method and max pooling) -> merge and flatten -> output(convedData list and kernel sets)
 
 
 from PIL import Image
@@ -199,11 +199,8 @@ class ConventionalConv:
 
 
 if __name__ == '__main__':
-    # conv(path, isMNIST, layers, times, strides)
+    # format: conv(path, isMNIST, layers, times per layer, strides)
     #convly = ConventionalConv('../pic/train.jpg', False, 3, 16, 2)
     convly = ConventionalConv('../pic/4/0.png', True, 2, 8, 2)
     print(convly.finalOutput)
     print("length of the output: ", len(convly.finalOutput))
-
-    # print(len(pooling), len(pooling[1]))
-    # print(pooling)

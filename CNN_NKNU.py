@@ -46,7 +46,7 @@ if __name__ == '__main__':
             # flatten = flatten2DTo1D(pooling1)
 
             # convly = conv('pic/{}/{}.png'.format(num,case), True, 2, 8, 2)
-            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
+            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 1)
             # kernel set format : [convLayer][kernals in each layer][Y axis of the kernal][X axis of the kernal]
             kernelSet = convly.getKernelSet()
             print(kernelSet)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             # flatten = flatten2DTo1D(pooling1)
 
             # convly = conv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
-            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
+            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 1)
             img_arr2.append(convly.finalOutput)
     predicted_output = sigmoid(np.dot(sigmoid(np.dot(img_arr2, weights_input_hidden)), weights_hidden_output))
     
