@@ -1,4 +1,5 @@
 from convolution.convByOOP import conv
+from convolution.conventionalConvolutionOOP import ConventionalConv
 from PIL import Image
 import numpy as np
 
@@ -43,10 +44,13 @@ if __name__ == '__main__':
             # output = lastmerge(nextconvdata)
             # pooling1 = pooling(output)
             # flatten = flatten2DTo1D(pooling1)
-            convly = conv('pic/{}/{}.png'.format(num,case), True, 2, 3, 2)
+
+            # convly = conv('pic/{}/{}.png'.format(num,case), True, 2, 8, 2)
+            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
             # kernel set format : [convLayer][kernals in each layer][Y axis of the kernal][X axis of the kernal]
             kernelSet = convly.getKernelSet()
             print(kernelSet)
+            print(len(convly.finalOutput))
             img_arr.append(convly.finalOutput)
             if (num == 3) :
                 ans_arr.append([1,0,0])
@@ -55,7 +59,7 @@ if __name__ == '__main__':
             else:
                 ans_arr.append([0,0,1])
                 
-    input_size = 676
+    input_size = len(convly.finalOutput)
     hidden_size = 400
     output_size = 3
     learning_rate = 0.005
@@ -101,7 +105,9 @@ if __name__ == '__main__':
             # output = lastmerge(nextconvdata)
             # pooling1 = pooling(output)
             # flatten = flatten2DTo1D(pooling1)
-            convly = conv('pic/{}/{}.png'.format(num, case), True, 2, 3, 2)
+
+            # convly = conv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
+            convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
             img_arr2.append(convly.finalOutput)
     predicted_output = sigmoid(np.dot(sigmoid(np.dot(img_arr2, weights_input_hidden)), weights_hidden_output))
     
