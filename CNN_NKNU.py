@@ -1,12 +1,6 @@
 from convolution.convByOOP import conv
-
 from PIL import Image
 import numpy as np
-import random
-from math import ceil
-
-width = 0
-height = 0
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -16,7 +10,7 @@ def sigmoid_derivative(x):
     return x * (1 - x)
 
 # 定義損失函數
-def MSE(answer, predict):  # y=predict x=answer
+def MSE(answer, predict):# y=predict x=answer
     length = len(predict)
     lossSum = 0
     for i in range(length):

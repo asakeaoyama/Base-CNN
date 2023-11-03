@@ -21,10 +21,9 @@ class conv():
         # convdata = firstConv(data, times , strides)
         convdata = self.data
         for i in range(layers):
-            convdata = self.nextConv(convdata, times, strides)
+            convdata = self.samePaddingConv(convdata, times, strides)
             print("---------------------------------------------")
         conved = self.lastmerge(convdata)
-
         pooling = self.pooling(conved)
         flatten = self.flatten2DTo1D(pooling)
         self.finalOutput = flatten
@@ -92,64 +91,7 @@ class conv():
         print(ker)
         return ker
 
-    def firstConv(self, data, times, strides):
-
-        # psteps = ( n(s-1) - s + f ) / 2
-        padding_steps = int((len(data) * (strides - 1) - strides + 3) / 2)
-        # padding
-        pdata = self.padding(data, padding_steps)
-        # calculate the output data size : ((n + 2p - f) / s ) + 1
-        sizeConvdataOut = int(len(data) + 2 * padding_steps - 3 / strides) + 1
-        # print(sizeConvdataOut)
-        # convdataOut[y][x][i = conv times(16)]
-        convdata = [[[0 for rgb in range(3)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
-        convdataGray = [[[0 for rgb in range(3)] for x in range(self.width)] for y in range(self.height)]
-        convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
-        kernelArr = []
-
-        for i in range(times):
-            kernel = self.ranKernel()
-            kernelArr.append(kernel)
-            for y in range(1, len(pdata) - 1):
-                for x in range(1, len(pdata[y]) - 1):
-                    convdata[y - 1][x - 1][0] = pdata[y - 1][x - 1][0] * kernel[0][0] + pdata[y - 1][x][0] * kernel[0][
-                        1] + pdata[y - 1][x + 1][0] * kernel[0][2] + \
-                                                pdata[y][x - 1][0] * kernel[1][0] + pdata[y][x][0] * kernel[1][1] + \
-                                                pdata[y][x + 1][0] * kernel[1][2] + \
-                                                pdata[y + 1][x - 1][0] * kernel[2][0] + pdata[y + 1][x][0] * kernel[2][
-                                                    1] + pdata[y + 1][x + 1][0] * kernel[2][2]
-                    convdata[y - 1][x - 1][1] = pdata[y - 1][x - 1][1] * kernel[0][0] + pdata[y - 1][x][1] * kernel[0][
-                        1] + \
-                                                pdata[y - 1][x + 1][1] * kernel[0][2] + \
-                                                pdata[y][x - 1][1] * kernel[1][0] + pdata[y][x][1] * kernel[1][1] + \
-                                                pdata[y][
-                                                    x + 1][1] * kernel[1][2] + \
-                                                pdata[y + 1][x - 1][1] * kernel[2][0] + pdata[y + 1][x][1] * kernel[2][
-                                                    1] + \
-                                                pdata[y + 1][x + 1][1] * kernel[2][2]
-                    convdata[y - 1][x - 1][2] = pdata[y - 1][x - 1][2] * kernel[0][0] + pdata[y - 1][x][2] * kernel[0][
-                        1] + \
-                                                pdata[y - 1][x + 1][2] * kernel[0][2] + \
-                                                pdata[y][x - 1][2] * kernel[1][0] + pdata[y][x][2] * kernel[1][1] + \
-                                                pdata[y][
-                                                    x + 1][2] * kernel[1][2] + \
-                                                pdata[y + 1][x - 1][2] * kernel[2][0] + pdata[y + 1][x][2] * kernel[2][
-                                                    1] + \
-                                                pdata[y + 1][x + 1][2] * kernel[2][2]
-                    # merge RGB data : convdata[][][] to convdataOut[][][]
-                    convdataOut[y - 1][x - 1][i] = convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + \
-                                                   convdata[y - 1][x - 1][2]
-                    x += strides - 1
-                y += strides - 1
-                # test trans to gray
-                # gray = (convdata[y - 1][x - 1][0] + convdata[y - 1][x - 1][1] + convdata[y - 1][x - 1][2]) / 3
-                # convdataGray[y - 1][x - 1][0] , convdataGray[y - 1][x - 1][1] , convdataGray[y - 1][x - 1][2] = gray, \
-                #                                                                                             gray, gray
-
-        # print(convdataOut)
-        return convdataOut
-
-    def nextConv(self, data, times, strides):
+    def samePaddingConv(self, data, times, strides):
         # psteps = ( n(s-1) - s + f ) / 2
         padding_steps = int(ceil((len(data) * (strides - 1) - strides + 3) / 2))
         print("datalen:", len(data))
