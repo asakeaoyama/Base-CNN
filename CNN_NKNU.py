@@ -1,5 +1,6 @@
 from convolution.convByOOP import conv
 from convolution.conventionalConvolutionOOP import ConventionalConv
+from convolution.fixedKernel_conventionalConvolutionOOP import FixedKernelConventionalConv
 from PIL import Image
 import numpy as np
 
@@ -41,20 +42,19 @@ if __name__ == '__main__':
     ans_arr = []
     for case in range(10, 60):
         for num in range(3, 6):
-            # data = importMNISTToData('../pic/{}/{}.png'.format(num,case)) # square picture only
-            # data = importMNISTToData('../pic/{}/{}.png'.format(num,case)) # square picture only
-            # convdata = nextConv(data,3 ,2)
-            # nextconvdata = nextConv(convdata, 3, 2)
-            # output = lastmerge(nextconvdata)
-            # pooling1 = pooling(output)
-            # flatten = flatten2DTo1D(pooling1)
 
             # convly = conv('pic/{}/{}.png'.format(num,case), True, 2, 8, 2)
             convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 1)
-            # kernel set format : [convLayer][kernals in each layer][Y axis of the kernal][X axis of the kernal]
+            # kernel set format : [convLayer][kernels in each layer][Y axis of the kernel][X axis of the kernel]
             kernelSet = convly.getKernelSet()
             print(kernelSet)
             print(len(convly.finalOutput))
+
+            # conv_fixedKernal = FixedKernelConventionalConv(Path, kernelSet, isMNIST, layers, times per layer, strides)
+            # kernel set format : [convLayer][kernels in each layer][Y axis of the kernel][X axis of the kernel]
+            convly_fixedKernel = FixedKernelConventionalConv('pic/{}/{}.png'.format(num, case), kernelSet, True, 2, 8,
+                                                             1)
+
             img_arr.append(convly.finalOutput)
             if num == 3:
                 ans_arr.append([1, 0, 0])
@@ -103,12 +103,6 @@ if __name__ == '__main__':
     img_arr2 = []
     for case in range(140, 190):
         for num in range(3, 6):
-            # data = importMNISTToData('{}/{}.png'.format(num,case)) # square picture only
-            # convdata = nextConv(data,3 ,2)
-            # nextconvdata = nextConv(convdata, 3, 2)
-            # output = lastmerge(nextconvdata)
-            # pooling1 = pooling(output)
-            # flatten = flatten2DTo1D(pooling1)
 
             # convly = conv('pic/{}/{}.png'.format(num, case), True, 2, 8, 2)
             convly = ConventionalConv('pic/{}/{}.png'.format(num, case), True, 2, 8, 1)
