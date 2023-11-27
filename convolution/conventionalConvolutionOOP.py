@@ -28,7 +28,7 @@ class ConventionalConv:
         for i in range(layers):
             convdata = self.conventionalConv(convdata, times, strides)
             convdata = self.poolingInConving(convdata)
-            print("---------------------------------------------")
+            #print("---------------------------------------------")
         conved = self.lastmerge(convdata)
         #pooling = self.pooling(conved)
         flatten = self.flatten2DTo1D(conved)
@@ -94,30 +94,30 @@ class ConventionalConv:
         for i in range(3):
             for j in range(3):
                 ker[i][j] = random.randint(0, 1)
-        print(ker)
+        #print(ker)
         return ker
 
     def conventionalConv(self, data, times, strides):
-        print("datalen:", len(data))
-        print("dataDepth:", len(data[0][0]))
+        #print("datalen:", len(data))
+        #print("dataDepth:", len(data[0][0]))
         # padding
         # padding trigger : len(data)-1 % stride == 1 then padding 1 step on left and below
         pdata = None
         if (len(data) - 1) % strides == 1:
             pdata = self.padding(data)
-            print("padding: True")
+            # print("padding: True")
         else:
             pdata = data
-            print("padding: False")
+            # print("padding: False")
         # calculate the conv output data size : ((n - 2) / s) + 1
         sizeConvdataOut = int(((len(data) - 2) / strides) + 1)
-        print("predictOutputLan:", sizeConvdataOut)
+        #print("predictOutputLan:", sizeConvdataOut)
         # pdata format: [y][x][i = conv times(16)]
         # convdataL2 format: [y][x]
         convdataL2 = [[0 for x in range(len(pdata[1]))] for y in range(len(pdata))]
         convdataOut = [[[0 for i in range(times)] for x in range(sizeConvdataOut)] for y in range(sizeConvdataOut)]
         kernelArr = []
-        print("preConvedOutputLen:", len(convdataL2))
+        #print("preConvedOutputLen:", len(convdataL2))
 
         # compress pdata(y*x*16dim) to condataL2(y*x*1dim)
         for y in range(len(pdata)):
@@ -148,7 +148,7 @@ class ConventionalConv:
                                                                                      convdataL2[y + 1][x + 1] * \
                                                                                      kernel[2][2]
         # print(convdataOut)
-        print("postConvedDataLen:", len(convdataOut))
+        #print("postConvedDataLen:", len(convdataOut))
         self.kerSet.append(kernelArr)
         return convdataOut
 
@@ -184,7 +184,7 @@ class ConventionalConv:
                     output[y - 1][x - 1][i] = max(data[y - 1][x - 1][i], data[y - 1][x][i], data[y - 1][x + 1][i],
                                                data[y][x - 1][i], data[y][x][i], data[y][x + 1][i],
                                                data[y + 1][x - 1][i], data[y + 1][x][i], data[y + 1][x + 1][i])
-        print(output)
+        #print(output)
         return output
 
     def flatten2DTo1D(self, poolingOut):
@@ -197,6 +197,21 @@ class ConventionalConv:
     def getKernelSet(self):
         return self.kerSet
 
+    # 製作答案
+    def makeAnswer(self, num, typeSize):
+        ans = []
+        # for i in range(typeSize):
+        #     if (i == num):
+        #         ans.append(1)
+        #     else:
+        #         ans.append(0)
+        if (num == 3):
+            ans = [1,0,0]
+        elif (num == 4):
+            ans = [0,1,0]
+        else:
+            ans = [0,0,1]
+        return ans
 
 if __name__ == '__main__':
     # format: conv(path, isMNIST, layers, times per layer, strides)
