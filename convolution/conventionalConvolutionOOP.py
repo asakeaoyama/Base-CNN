@@ -200,17 +200,17 @@ class ConventionalConv:
     # 製作答案
     def makeAnswer(self, num, typeSize):
         ans = []
-        # for i in range(typeSize):
-        #     if (i == num):
-        #         ans.append(1)
-        #     else:
-        #         ans.append(0)
-        if (num == 3):
-            ans = [1,0,0]
-        elif (num == 4):
-            ans = [0,1,0]
-        else:
-            ans = [0,0,1]
+        for i in range(typeSize):
+            if (i == num):
+                ans.append(1)
+            else:
+                ans.append(0)
+        # if (num == 3):
+        #     ans = [1,0,0]
+        # elif (num == 4):
+        #     ans = [0,1,0]
+        # else:
+        #     ans = [0,0,1]
         return ans
 
 if __name__ == '__main__':
