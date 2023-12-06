@@ -17,7 +17,7 @@ class fullyConnected:
     def __init__(self, X,Y,weights_input_hidden,bias_input_hidden,weights_hidden_output,bias_hidden_output,activation, lossFunction):
         # 全連接
         # 使用sigmoid
-        if (activation == "sigmoid"):
+        if (activation == "Sigmoid"):
             self.input_layer_hidden, self.loss, self.hidden_layer_output, self.error = self.fullyConnectSigmoid(X, Y, weights_input_hidden, bias_input_hidden, lossFunction, weights_hidden_output, bias_hidden_output)
 
 
