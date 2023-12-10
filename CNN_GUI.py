@@ -50,6 +50,7 @@ def train_model():
     trainSize = int(train_entry.get())
     typeSize = int(type_entry.get())
     activation = activation_dropdown.get()
+    filter = kernel_dropdown.get()
     img_arr = []
     ans_arr = []
     total_size = typeSize*trainSize
@@ -58,7 +59,7 @@ def train_model():
     for case in range(trainSize):
         for num in range(typeSize):
             path = selected_train_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
-            convly = ConventionalConv(path, False, 2, 8, stride)
+            convly = ConventionalConv(path, False, 2, 8, stride, filter)
             img_arr.append(convly.finalOutput)
             ans = convly.makeAnswer(num, typeSize)
             ans_arr.append(ans)
@@ -74,9 +75,14 @@ def train_model():
 
         fc = fullyConnected(img_arr, ans_arr, CW.weights_input_hidden, CW.bias_input_hidden,
                              CW.weights_hidden_output, CW.bias_hidden_output, activation, "MSE")
-        fc.updateWeightSigmoid(fc.error, fc.hidden_layer_output, img_arr, CW.weights_hidden_output,
+        if (activation == "Sigmoid"):
+            fc.updateWeightSigmoid(fc.error, fc.hidden_layer_output, img_arr, CW.weights_hidden_output,
                                fc.input_layer_hidden, CW.bias_hidden_output, CW.weights_input_hidden,
                                CW.bias_input_hidden, learning_rate)
+        elif (activation == "ReLU"):
+            fc.updateWeightRelu(fc.error, fc.hidden_layer_output, img_arr, CW.weights_hidden_output,
+                                   fc.input_layer_hidden, CW.bias_hidden_output, CW.weights_input_hidden,
+                                   CW.bias_input_hidden, learning_rate)
         trainAccuracy = CW.maxWeight(CW.weights_input_hidden, CW.weights_hidden_output, CW.bias_input_hidden,
                                      CW.bias_hidden_output, epoch, fc.hidden_layer_output, ans_arr)
         if epoch % 100 == 0:
@@ -91,7 +97,7 @@ def train_model():
     for case in range(trainSize):
         for num in range(typeSize):
             path = selected_test_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
-            convly2 = ConventionalConv(path, False, 2, 8, stride)
+            convly2 = ConventionalConv(path, False, 2, 8, stride, filter)
             img_arr2.append(convly2.finalOutput)
             ans2 = convly2.makeAnswer(num, typeSize)
             ans_arr2.append(ans2)
@@ -169,6 +175,14 @@ activation_dropdown = ttk.Combobox(root, textvariable=activation_var, values=act
 activation_dropdown.grid(column=2, row=6, padx=10, pady=10)
 activation_dropdown.set(activation_functions[0])  # Set default activation function
 
+# 選擇濾波器的下拉選單
+ttk.Label(root, text="Kernel/Filter(卷積核):").grid(column=2, row=7, padx=10, pady=10)
+kernel_types = ["Normal Filter(01)", "Sobel Filter(-11)"]
+kernel_var = tk.StringVar()
+kernel_dropdown = ttk.Combobox(root, textvariable=kernel_var, values=kernel_types)
+kernel_dropdown.grid(column=2, row=8, padx=10, pady=10)
+kernel_dropdown.set(kernel_types[0])  # Set default activation function
+
 # 顯示 loss 的地方
 loss_var = tk.StringVar()
 loss_var.set("Current Loss(訓練損失值) : ")
@@ -195,10 +209,10 @@ time_label.grid(column=0, row=9, columnspan=1, pady=20)
 
 # start train button
 train_button = ttk.Button(root, text="開始訓練", command=start_training_thread)
-train_button.grid(column=2, row=7, columnspan=2, pady=20)
+train_button.grid(column=2, row=9, columnspan=2, pady=20)
 
 # cancel train button
 cancel_button = ttk.Button(root, text="取消訓練", command=cancel_training_callback)
-cancel_button.grid(column=2, row=8, columnspan=2, pady=20)
+cancel_button.grid(column=2, row=10, columnspan=2, pady=20)
 
 root.mainloop()

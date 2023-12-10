@@ -17,7 +17,7 @@ class ConventionalConv:
 
     finalOutput = 0
 
-    def __init__(self, path, isMNIST, layers, times, strides):
+    def __init__(self, path, isMNIST, layers, times, strides, filter):
 
         if (isMNIST == True):
             self.data = self.importMNISTToData(path)  # square picture only
@@ -26,7 +26,7 @@ class ConventionalConv:
         # convdata = firstConv(data, times , strides)
         convdata = self.data
         for i in range(layers):
-            convdata = self.conventionalConv(convdata, times, strides)
+            convdata = self.conventionalConv(convdata, times, strides, filter)
             convdata = self.poolingInConving(convdata)
             #print("---------------------------------------------")
         conved = self.lastmerge(convdata)
@@ -79,6 +79,9 @@ class ConventionalConv:
         self.data = data
         return data
 
+    def relu(self, x):
+        return np.maximum(0, x)
+
     def padding(self, convdata):
         # print(convdata)
         pdata = [[[0 for i in range(len(convdata[0][0]))] for x in range(len(convdata[0]) + 1)] for y in
@@ -89,15 +92,20 @@ class ConventionalConv:
                     pdata[y][x][i] = convdata[y][x][i]
         return pdata
 
-    def ranKernel(self):
+    def ranKernel(self, filter):
         ker = [[0 for x in range(3)] for y in range(3)]
-        for i in range(3):
-            for j in range(3):
-                ker[i][j] = random.randint(0, 1)
+        if (filter == "Normal Filter(01)"):
+            for i in range(3):
+                for j in range(3):
+                    ker[i][j] = random.randint(0, 1)
+        elif (filter == "Sobel Filter(-11)"):
+            for i in range(3):
+                for j in range(3):
+                    ker[i][j] = random.randint(-1, 1)
         #print(ker)
         return ker
 
-    def conventionalConv(self, data, times, strides):
+    def conventionalConv(self, data, times, strides, filter):
         #print("datalen:", len(data))
         #print("dataDepth:", len(data[0][0]))
         # padding
@@ -126,7 +134,7 @@ class ConventionalConv:
 
         # convolution
         for i in range(times):
-            kernel = self.ranKernel()
+            kernel = self.ranKernel(filter)
             kernelArr.append(kernel)
             for y in range(1, len(convdataL2) - strides, strides):
                 for x in range(1, len(convdataL2[y]) - strides, strides):
@@ -149,6 +157,7 @@ class ConventionalConv:
                                                                                      kernel[2][2]
         # print(convdataOut)
         #print("postConvedDataLen:", len(convdataOut))
+        kernelArr = self.relu(kernelArr)
         self.kerSet.append(kernelArr)
         return convdataOut
 

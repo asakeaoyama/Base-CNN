@@ -19,6 +19,8 @@ class fullyConnected:
         # 使用sigmoid
         if (activation == "Sigmoid"):
             self.input_layer_hidden, self.loss, self.hidden_layer_output, self.error = self.fullyConnectSigmoid(X, Y, weights_input_hidden, bias_input_hidden, lossFunction, weights_hidden_output, bias_hidden_output)
+        elif (activation == "ReLU"):
+            self.input_layer_hidden, self.loss, self.hidden_layer_output, self.error = self.fullyConnectRelu(X, Y, weights_input_hidden, bias_input_hidden, lossFunction, weights_hidden_output, bias_hidden_output)
 
 
     # 定義sigmoid
@@ -31,7 +33,11 @@ class fullyConnected:
 
     # 定義relu
     def relu(self, x):
-        return max(0, x)
+        return np.maximum(0, x)
+
+    # 定義relu的導數
+    def relu_derivative(self, x):
+        return np.where(x > 0, 1, 0)
 
     # 定義損失函數
     def MSE(self, answer, predict):  # y=predict x=answer
@@ -53,7 +59,7 @@ class fullyConnected:
             error, loss = self.MSE(Y, hidden_layer_output)
         return input_layer_hidden, loss, hidden_layer_output, error
 
-    #更新權重
+    #更新權重sigmoid
     def updateWeightSigmoid(self, error, hidden_layer_output, X, weights_hidden_output, input_layer_hidden, bias_hidden_output, weights_input_hidden, bias_input_hidden, learning_rate):
         # 反向傳播1
         d_output = error * self.sigmoid_derivative(hidden_layer_output)
@@ -66,3 +72,30 @@ class fullyConnected:
         weights_input_hidden += X.T.dot(d_hidden) * learning_rate
         bias_input_hidden += d_hidden * learning_rate
 
+    # 全連接層relu
+    def fullyConnectRelu(self, X, Y, weights_input_hidden, bias_input_hidden, lossFunction,
+                            weights_hidden_output, bias_hidden_output):
+        # 向前傳播1
+        input_layer_hidden = np.dot(X, weights_input_hidden)
+        input_layer_hidden += bias_input_hidden
+        input_layer_hidden = self.relu(input_layer_hidden)
+        hidden_layer_output = np.dot(input_layer_hidden, weights_hidden_output)
+        hidden_layer_output += bias_hidden_output
+        hidden_layer_output = self.relu(hidden_layer_output)
+        if (lossFunction == "MSE"):
+            error, loss = self.MSE(Y, hidden_layer_output)
+        return input_layer_hidden, loss, hidden_layer_output, error
+
+    # 更新權重relu
+    def updateWeightRelu(self, error, hidden_layer_output, X, weights_hidden_output, input_layer_hidden,
+                            bias_hidden_output, weights_input_hidden, bias_input_hidden, learning_rate):
+        # 反向傳播1
+        d_output = error * self.relu_derivative(hidden_layer_output)
+        error_hidden = d_output.dot(weights_hidden_output.T)
+        d_hidden = error_hidden * self.relu_derivative(input_layer_hidden)
+        # 更新權重1
+        weights_hidden_output += input_layer_hidden.T.dot(d_output) * learning_rate
+        bias_hidden_output += d_output * learning_rate
+        X = np.array(X)  # transfer list to array
+        weights_input_hidden += X.T.dot(d_hidden) * learning_rate
+        bias_input_hidden += d_hidden * learning_rate
