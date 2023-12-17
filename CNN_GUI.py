@@ -41,6 +41,8 @@ def train_model():
     print('start')
     now = datetime.datetime.now()
     print(now)
+    final_ans.set("最終預測結果 : ")
+    spend_time.set("花費時間 : ")
     update(0,0,0)
     global cancel_training
     epochs = int(epochs_entry.get())
