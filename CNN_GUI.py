@@ -60,11 +60,18 @@ def train_model():
 
     for case in range(trainSize):
         for num in range(typeSize):
-            path = selected_train_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
-            convly = ConventionalConv(path, False, 2, 8, stride, filter)
-            img_arr.append(convly.finalOutput)
-            ans = convly.makeAnswer(num, typeSize)
-            ans_arr.append(ans)
+            if(selected_train_folder_path[len(selected_train_folder_path)-5:len(selected_train_folder_path)] == "mbers"):
+                path = selected_train_folder_path + '/{}'.format(num) + '/{}.png'.format(case)
+                convly = ConventionalConv(path, True, 2, 8, stride, filter)
+                img_arr.append(convly.finalOutput)
+                ans = convly.makeAnswer(num, typeSize)
+                ans_arr.append(ans)
+            elif(selected_train_folder_path[len(selected_train_folder_path)-5:len(selected_train_folder_path)] == "train"):
+                path = selected_train_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
+                convly = ConventionalConv(path, False, 2, 8, stride, filter)
+                img_arr.append(convly.finalOutput)
+                ans2 = convly.makeAnswer(num, typeSize)
+                ans_arr.append(ans2)
 
     input_size = len(convly.finalOutput)
     output_size = typeSize
@@ -98,11 +105,19 @@ def train_model():
     ans_arr2 = []
     for case in range(trainSize):
         for num in range(typeSize):
-            path = selected_test_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
-            convly2 = ConventionalConv(path, False, 2, 8, stride, filter)
-            img_arr2.append(convly2.finalOutput)
-            ans2 = convly2.makeAnswer(num, typeSize)
-            ans_arr2.append(ans2)
+            if (selected_test_folder_path[len(selected_test_folder_path)-5:len(selected_test_folder_path)] == "mbers"):
+                path = selected_test_folder_path + '/{}'.format(num) + '/{}.png'.format(case)
+                convly2 = ConventionalConv(path, True, 2, 8, stride, filter)
+                img_arr2.append(convly2.finalOutput)
+                ans2 = convly2.makeAnswer(num, typeSize)
+                ans_arr2.append(ans2)
+            elif (selected_test_folder_path[len(selected_test_folder_path)-5:len(selected_test_folder_path)] == "valid"):
+                path = selected_test_folder_path + '/{}'.format(num) + '/{}.jpg'.format(img_num(str(case)))
+                convly2 = ConventionalConv(path, False, 2, 8, stride, filter)
+                img_arr2.append(convly2.finalOutput)
+                ans2 = convly2.makeAnswer(num, typeSize)
+                ans_arr2.append(ans2)
+
     fc2 = fullyConnected(img_arr2, ans_arr2, CW.max_weights_input_hidden, CW.max_bias_input_hidden,
                          CW.max_weights_hidden_output, CW.max_bias_hidden_output, activation, "MSE")
     final_ans.set("最終預測結果 : " + str(CW.acc(fc2.hidden_layer_output, ans_arr2)) + '%')
